@@ -1,0 +1,8 @@
+title = 'This is my post'
+file_name = 'first-post'
+description = 'The first article authored by me'
+tags = ['']
+posted = '22/08/2022'
+estimated_reading_time = 13
+author = 'Mijan' 
+order = 1

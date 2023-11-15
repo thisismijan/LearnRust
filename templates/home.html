@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Awesome blog | by DeveloperMan{% endblock title %}
+
+{% block content %}
+<div class="w-full h-full px-4 md:px-6 text-xl text-gray-800 leading-normal">
+    <h1 class="text-center text-3xl">Mijan Learns Rust</h1>
+    <h3 class="text-center text-lg mt-2 text-gray-600">Journalling learning Rust from scratch</h3>
+    {% for fm in posts %}
+    <a class="mb-3" href="/posts/{{fm.file_name}}">
+        <div class="flex flex-col mb-5 px-4 py-6 cursor-pointer">
+            <h2 class="text-2xl font-semibold hover:underline">{{fm.title}}</h2>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock content %}
