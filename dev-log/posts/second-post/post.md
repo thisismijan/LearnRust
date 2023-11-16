@@ -1,10 +1,6 @@
-#First Post
+#Second Post
 
-This is my first post, in what i am hoping to be many, in my journey to learn the Rust programming language.
+I am planning on building an adaptive chess engine for my first project in Rust. 
 
-This dev log has been written in Rust as my first small project. With my learnings so far being:
-* installing Rust
-* cargo new/build/run
-* cargo dependencies
-* basic Rust syntax
+I am currently in a "learning chess" phase and I think it would be good to ride on the wave of my current interests in chess to give me a bit more motivation for this Rust project.
 

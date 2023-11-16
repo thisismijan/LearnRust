@@ -12,7 +12,6 @@ fn get_all_file_contents_in_folder(folder: &str, file_type: &str) -> Result<Vec<
     .map_err(|e| Error::new(std::io::ErrorKind::Other, e))?;
 
     let post_folder_toml_files = WalkBuilder::new(folder).types(file_type_matcher).build();
-
     let mut frontmatters = Vec::new();
 
     for toml_file in post_folder_toml_files {
