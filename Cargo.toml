@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "dev-log",
+    "adaptive-chess",
+]
