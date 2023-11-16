@@ -22,7 +22,7 @@ pub async fn post(tmpl: web::Data<tera::Tera>, post_name: web::Path<String>) -> 
 		let mut html_output = String::new();
 		let parser = Parser::new_ext(&markdown_input, Options::empty());
 		html::push_html(&mut html_output, parser);
-        println!("{}",html_output);
+
         let mut context = tera::Context::new();
 
         context.insert("post", &html_output);
