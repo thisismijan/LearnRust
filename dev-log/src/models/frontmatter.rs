@@ -6,9 +6,6 @@ pub struct Frontmatter {
     file_name: String,
     description: String,
     posted: String,
-    tags: Vec<String>,
-    author: String,
-    estimated_reading_time: u32,
     order: u32,
 }
 
