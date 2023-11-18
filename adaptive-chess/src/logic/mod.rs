@@ -1,1 +1,1 @@
-mod fen_parser;
+pub mod fen_parser;

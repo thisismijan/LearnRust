@@ -1,14 +1,15 @@
+use crate::model::board::{BoardConfig, BoardMatrix};
 use crate::model::piece::{BoardPiece, BoardPiece::*, Colour, Piece::*};
-use crate::model::board::{BoardConfig, BoardConfig::*, BoardMatrix};
+
+
 pub struct Fen;
 
 impl Fen {
-
-    pub fn make_board_config_from_str(s: &str) -> BoardConfig {
-        Fen::make_board_config(s);
+    pub fn make_board_config_from_fen_str(s: &str) -> BoardConfig {
+        Fen::make_board_config(s)
     }
 
-    pub fn make_fen_from_board_config(board_config: &BoardConfig) -> String {
+    pub fn make_fen_str_from_board_config(board_config: &BoardConfig) -> String {
         let mut fen = String::new();
         for y in 0..8 {
             let mut empty = 0;
@@ -26,29 +27,77 @@ impl Fen {
             if empty > 0 {
                 fen.push_str(&empty.to_string());
             }
-            //end of rank   
-            fen.push('/');
+            //end of rank
+            if y < 7 { 
+                fen.push('/');
+            }
         }
-        // end of files and add which colours turn it is to config
-        match board_config.get_active_colour(){
+        // end of files and add which colour's turn it is to config
+        match board_config.get_active_colour() {
             Colour::White => fen.push_str(" w "),
             Colour::Black => fen.push_str(" b "),
         }
-        //TODO: can white castle short
-        //TODO: can white castle long
-        //TODO: can black castle short
-        //TODO: can black castle long
+        if board_config.can_white_castle_short() {
+            fen.push_str("K");
+        }
+        if board_config.can_white_castle_long() {
+            fen.push_str("Q");
+        }
+        if board_config.can_black_castle_short() {
+            fen.push_str("k");
+        }
+        if board_config.can_black_castle_long() {
+            fen.push_str("q");
+        }
         fen.push(' ');
-        //TODO: is en passant available
-        //TODO: half move clock
-        //TODO: full move clock
-        s
+        if let Some(coord) = board_config.get_en_passant_on_coord() {
+            fen.push_str(&Fen::get_square_from_coord(coord));
+        } else {
+            fen.push('-');
+        }
+        fen.push(' ');
+        fen.push_str(&board_config.get_halfmove_clock().to_string());
+        fen.push(' ');
+        fen.push_str(&board_config.get_fullmove_number().to_string());
+        fen
+    }
+
+    fn get_square_from_coord(coord: (usize, usize)) -> String {
+        let file = 'a'.to_ascii_lowercase() as u8 + coord.0 as u8;
+        let rank = (8 - coord.1) as u8;
+        std::str::from_utf8(&[file, rank]).unwrap().to_string()
+    }
+
+    fn get_coords_from_square(square: &str) -> (usize, usize) {
+        let a = 'a'.to_ascii_lowercase() as usize;
+
+        let mut square_chars = square.chars();
+        let c = square_chars.next().unwrap();
+
+        let file = if c.is_alphabetic() {
+            c.to_ascii_lowercase() as usize - a
+        } else {
+            log::error!("invalid file: {} is invalid square", square);
+            panic!();
+        };
+
+        let n: String = square_chars.collect();
+        let rank = 8 as usize - n.parse::<usize>().unwrap();
+
+        (file, rank)
     }
 
     fn make_board_config(fen_str: &str) -> BoardConfig {
         let mut board_matrix = BoardMatrix::default();
         let mut active_colour = Colour::White;
-        for(i, data) in fen_str.split_whitespace().enumerate() {
+        let mut white_castle_short = false;
+        let mut white_castle_long = false;
+        let mut black_castle_short = false;
+        let mut black_castle_long = false;
+        let mut en_passant_on_coord: Option<(usize, usize)> = None;
+        let mut halfmove_clock = 0;
+        let mut fullmove_number = 0;
+        for (i, data) in fen_str.split_whitespace().enumerate() {
             match i {
                 0 => {
                     for (i, rank) in data.split('/').enumerate() {
@@ -81,16 +130,42 @@ impl Fen {
                     }
                 }
                 2 => {
-                    //TODO castling
+                    if !(data.len() == 1 && data.chars().next() == Some('-')) {
+                        let mut chars = data.chars();
+                        while let Some(c) = chars.next() {
+                            match c {
+                                'K' => white_castle_short = true,
+                                'Q' => white_castle_long = true,
+                                'k' => black_castle_short = true,
+                                'q' => black_castle_long = true,
+                                _ => {
+                                    log::error!("Castle field invalid: {}", c);
+                                    panic!();
+                                }
+                            }
+                        }
+                    }
                 }
                 3 => {
-                    //TODO en passant
+                    if !(data.len() == 1 && data.chars().next() == Some('-')) {
+                        en_passant_on_coord = Some(Self::get_coords_from_square(data));
+                    }
                 }
                 4 => {
-                    //TODO half move clock
+                    if let Ok(n) = data.parse::<u32>() {
+                        halfmove_clock = n;
+                    } else {
+                        log::error!("Halfmove clock field invalid: {}", data);
+                        panic!();
+                    }
                 }
                 5 => {
-                    //TODO full move clock
+                    if let Ok(n) = data.parse::<u32>() {
+                        fullmove_number = n;
+                    } else {
+                        log::error!("Fullmove number field invalid: {}", data);
+                        panic!();
+                    }
                 }
                 _ => {
                     log::error!("Fen string invalid");
@@ -103,9 +178,15 @@ impl Fen {
             board_matrix,
             fen_str: fen_str.to_string(),
             active_colour,
+            white_castle_short,
+            white_castle_long,
+            black_castle_short,
+            black_castle_long,
+            en_passant_on_coord,
+            halfmove_clock,
+            fullmove_number,
         }
     }
-
 
     //TODO is there a rust BiMap? These two lookups will be called a lot, so need to research efficient data structures for them
 
@@ -145,9 +226,27 @@ impl Fen {
             'P' => BoardPiece::White(Pawn),
             'p' => BoardPiece::Black(Pawn),
             _ => {
-                    log::error!("Invalid piece: {}", c);
-                    panic!()
-                }
+                log::error!("Invalid piece: {}", c);
+                panic!()
+            }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_make_board_config_from_fen_string_default() {
+        let board_config = Fen::make_board_config_from_fen_str("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        assert_eq!(board_config.get_active_colour(), Colour::White);
+    }
+
+    #[test]
+    fn test_make_fen_str_from_board_config_default() {
+        let board_config = BoardConfig::default();
+        let fen_str = Fen::make_fen_str_from_board_config(&board_config);
+        assert_eq!(fen_str, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 }
