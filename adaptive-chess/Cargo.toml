@@ -8,3 +8,16 @@ edition = "2021"
 [dependencies]
 log = "0.4.20"
 pretty_env_logger = "0.5.0"
+pixels = "0.13.0"
+resvg = "0.36.0"
+winit = { version = "0.29.1", features = ["rwh_05"]}
+# egui = "0.23.0"
+# egui-winit = {version = "0.23.0", default-features = false, features = ["links"]}
+# egui-wgpu = "0.23.0"
+
+# console_error_panic_hook = "0.1"
+# console_log = "1.0.0"
+# wasm-bindgen = "0.2"
+# wasm-bindgen-futures = "0.4"
+# web-sys = {version = "0.3", features = ["GpuTextureFormat"]}
+# rust-embed = {version = "8.0.0", features = ["debug-embed"]}

@@ -1,4 +1,4 @@
-use crate::model::board::{BoardConfig, BoardMatrix};
+use super::board_config::{BoardConfig, BoardMatrix};
 use crate::model::piece::{BoardPiece, BoardPiece::*, Colour, Piece::*};
 
 

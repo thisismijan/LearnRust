@@ -27,24 +27,24 @@ impl fmt::Display for BoardPiece {
         use BoardPiece::*;
         use Piece::*;
 
-        //using FEN
+        //matching name of the image in assets
 
         let name = match self {
             White(p) => match p {
-                King => "K",
-                Queen => "Q",
-                Rook => "R",
-                Bishop => "B",
-                Knight => "N",
-                Pawn => "P",
+                King => "k_q",
+                Queen => "q_w",
+                Rook => "r_w",
+                Bishop => "b_w",
+                Knight => "n_w",
+                Pawn => "p_w",
             },
             Black(p) => match p {
-                King => "k",
-                Queen => "q",
-                Rook => "r",
-                Bishop => "b",
-                Knight => "n",
-                Pawn => "p",
+                King => "k_b",
+                Queen => "q_b",
+                Rook => "r_b",
+                Bishop => "b_b",
+                Knight => "n_b",
+                Pawn => "p_b",
             },
         };
 
