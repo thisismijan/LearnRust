@@ -1,3 +1,5 @@
 /adaptive-chess/target
 /dev-log/target
 /dev-log/tailwind/node_modules/*
+/advent-of-code-2023/day-*/target
+*.vs*
