@@ -47,21 +47,6 @@ impl Game {
     fn add(&mut self, colour: &str, amount: u32) {
         self.cubes.push(Cube::new(colour.to_string(), amount));
     }
-
-    fn get_power(&self) -> u32 {
-        let mut min_red = 0;
-        let mut min_green = 0;
-        let mut min_blue = 0;
-        self.cubes.iter().for_each(|cube| {
-            match cube.colour.as_str() {
-            "red" => min_red = std::cmp::max(min_red, cube.amount),
-            "green" => min_green = std::cmp::max(min_green, cube.amount),
-            "blue" => min_blue = std::cmp::max(min_blue, cube.amount),
-             _ => panic!("invalid colour: {}", cube.colour)
-            }
-        });
-        min_red * min_blue * min_green
-    }
 }
 
 fn process(input: &str) -> u32 {
@@ -88,7 +73,9 @@ fn process(input: &str) -> u32 {
                     game.add(colour, amount);
                 });
             });
-            game.get_power()
+            let max_values: HashMap<&str, u32> =
+                HashMap::from([("red", 12), ("green", 13), ("blue", 14)]);
+            game.is_valid(max_values)
         })
         .sum::<u32>();
     return output;
@@ -97,6 +84,15 @@ fn process(input: &str) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("Game 1: 1 green, 1 blue, 1 red; 3 green, 1 blue, 1 red; 4 green, 3 blue, 1 red; 4 green, 2 blue, 1 red; 3 blue, 3 green", 1)]
+    #[case("Game 5: 2 red, 1 blue, 4 green; 6 blue, 2 green; 2 red, 5 green", 5)]
+    #[case("Game 95: 13 blue, 5 red; 9 blue, 3 red, 7 green; 10 green, 4 red, 12 blue; 14 blue; 7 green, 2 blue, 1 red", 95)]
+    fn test_case(#[case] input: &str, #[case] expected: u32) {
+        assert_eq!(expected, process(input))
+    }
 
     #[test]
     fn test_process() {
@@ -107,6 +103,6 @@ mod tests {
         Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
 
         let result = process(input);
-        assert_eq!(2286, result);
+        assert_eq!(8, result);
     }
 }
