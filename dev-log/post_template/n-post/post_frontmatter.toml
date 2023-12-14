@@ -1,0 +1,5 @@
+title = '&title'
+file_name = '&n-post'
+description = 'The &n article authored by me'
+posted = '&date'
+order = &n
